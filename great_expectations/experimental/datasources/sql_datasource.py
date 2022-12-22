@@ -131,10 +131,10 @@ class SqlYearMonthSplitter(ColumnSplitter):
 # need any of the features for these queries:
 # https://docs.sqlalchemy.org/en/14/core/sqlelement.html#sqlalchemy.sql.expression.text
 def _get_sql_datetime_range(
-    conn: sqlalchemy.engine.Engine, table_name: str, col_name: str
+    saengine: sqlalchemy.engine.Engine, table_name: str, col_name: str
 ) -> DatetimeRange:
     q = f"select min({col_name}), max({col_name}) from {table_name}"
-    min_max_dt = list(conn.execute(q))[0]
+    min_max_dt = list(saengine.execute(q))[0]
     return DatetimeRange(min=min_max_dt[0], max=min_max_dt[1])
 
 
