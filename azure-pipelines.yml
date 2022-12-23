@@ -275,6 +275,16 @@ stages:
         steps:
           - bash: |
               DOCKER_TAG="$(python.version)_$(IMAGE_SUFFIX)"
+              # Wait for postgres to come up
+              export i=0
+              until timeout 3 psql -h localhost -p 5432 -d test_ci -U postgres -c "select 1" > /dev/null
+              do
+                if [ $i -ge 4 ]; then echo "ERROR: Failed to connect to postgres"; exit 1; fi
+                i=$((i+1))
+                echo "Wait ${i}: sleeping 3 seconds for PostgreSQL to come up"
+                sleep 3;
+              done
+              echo "Postgres is up!"
               PYTEST="docker run greatexpectations/test:${DOCKER_TAG} "
               # We do NOT randomize the spark tests.
               # Spark only allows 1 context per JVM process, so we share it between tests.
